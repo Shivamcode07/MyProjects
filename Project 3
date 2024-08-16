@@ -1,0 +1,127 @@
+#include <iostream>
+#include <ctime>
+using namespace std;
+
+void drawBoard(char *board);
+void playerMove(char *board, char playerMarker);
+void computerMove(char *board, char computerMarker);
+bool checkWinner(char *board, char playerMarker, char computerMarker);
+bool checkTie(char *board);
+
+int main() {
+    char playAgain;
+
+    do {
+        char board[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+        char playerMarker = 'X';
+        char computerMarker = 'O';
+        bool gameRunning = true;
+
+        drawBoard(board);
+
+        while (gameRunning) {
+            playerMove(board, playerMarker);
+            drawBoard(board);
+            if (checkWinner(board, playerMarker, computerMarker)) {
+                gameRunning = false;
+                break;
+            }
+            if (checkTie(board)) {
+                cout << "It's a tie!" << endl;
+                gameRunning = false;
+                break;
+            }
+
+            computerMove(board, computerMarker);
+            drawBoard(board);
+            if (checkWinner(board, playerMarker, computerMarker)) {
+                gameRunning = false;
+                break;
+            }
+            if (checkTie(board)) {
+                cout << "It's a tie!" << endl;
+                gameRunning = false;
+                break;
+            }
+        }
+
+        cout << "Do you want to play again? (y/n): ";
+        cin >> playAgain;
+
+    } while (playAgain == 'y' || playAgain == 'Y');
+
+    cout << "Thank you for playing!" << endl;
+    return 0;
+}
+
+void drawBoard(char *board) {
+    cout << endl;
+    cout << "     |     |     " << endl;
+    cout << "  " << board[0] << "  |  " << board[1] << "  |  " << board[2] << "  " << endl;
+    cout << "_____|_____|_____" << endl;
+    cout << "     |     |     " << endl;
+    cout << "  " << board[3] << "  |  " << board[4] << "  |  " << board[5] << "  " << endl;
+    cout << "_____|_____|_____" << endl;
+    cout << "     |     |     " << endl;
+    cout << "  " << board[6] << "  |  " << board[7] << "  |  " << board[8] << "  " << endl;
+    cout << endl;
+}
+
+void playerMove(char *board, char playerMarker) {
+    int move;
+    do {
+        cout << "Mark your square on the grid (1-9): ";
+        cin >> move;
+        move--;
+        if (move >= 0 && move < 9 && board[move] == ' ') {
+            board[move] = playerMarker;
+            break;
+        } else {
+            cout << "Invalid move. Try again." << endl;
+        }
+    } while (true);
+}
+
+void computerMove(char *board, char computerMarker) {
+    int randomMove;
+    srand(time(NULL));
+    while (true) {
+        randomMove = rand() % 9;
+        if (board[randomMove] == ' ') {
+            board[randomMove] = computerMarker;
+            break;
+        }
+    }
+}
+
+bool checkWinner(char *board, char playerMarker, char computerMarker) {
+    int winConditions[8][3] = {
+        {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, 
+        {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, 
+        {0, 4, 8}, {2, 4, 6}             
+    };
+
+    for (int i = 0; i < 8; i++) {
+        if (board[winConditions[i][0]] == playerMarker &&
+            board[winConditions[i][1]] == playerMarker &&
+            board[winConditions[i][2]] == playerMarker) {
+            cout << "Player wins!" << endl;
+            return true;
+        } else if (board[winConditions[i][0]] == computerMarker &&
+                   board[winConditions[i][1]] == computerMarker &&
+                   board[winConditions[i][2]] == computerMarker) {
+            cout << "Computer wins!" << endl;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool checkTie(char *board) {
+    for (int i = 0; i < 9; i++) {
+        if (board[i] == ' ') {
+            return false;
+        }
+    }
+    return true; 
+}
